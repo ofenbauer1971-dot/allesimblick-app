@@ -1,0 +1,18 @@
+{
+  "name": "AllesImBlick",
+  "short_name": "AllesImBlick",
+  "description": "Dein persönlicher Alltagsorganizer",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f2fbfb",
+  "theme_color": "#007f86",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
