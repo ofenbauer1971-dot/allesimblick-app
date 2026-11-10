@@ -109,7 +109,7 @@ async function syncGoogleCalendar(){
       let response=await fetch(url,{method,headers,body:JSON.stringify(event)});
       if(response.status===404&&item.googleEventId){delete item.googleEventId;delete item.googleCalendarId;eventCalendarId=selectedCalendarId||'primary';url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(eventCalendarId)+'/events';method='POST';response=await fetch(url,{method,headers,body:JSON.stringify(event)});}
       if(!response.ok){failed++;continue;}
-      if(method==='POST'){const saved=await response.json();item.googleEventId=saved.id;item.googleCalendarId=method==='POST'?(url.match(/calendars\/([^/]+)\/events/)||[])[1]||selectedCalendarId:'primary';created++;}else updated++;
+      if(method==='POST'){const saved=await response.json();item.googleEventId=saved.id;item.googleCalendarId=eventCalendarId;created++;}else updated++;
     }
     localStorage.setItem(KEY,JSON.stringify(items));
     googleStatus('Synchronisierung: '+created+' neu, '+updated+' aktualisiert, '+deleted+' gelöscht'+(failed?', '+failed+' fehlgeschlagen.':' – alles erfolgreich.')+' Neue Einträge gehen in den ausgewählten Kalender; bestehende Verknüpfungen bleiben erhalten.'+(dated.some(x=>Number(x.remind??30)>28)?' Hinweis: Google Kalender kann Popup-Erinnerungen höchstens 28 Tage vorher setzen. Längere Vorlaufzeiten zeigt AllesImBlick in der App an.':''));
