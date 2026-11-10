@@ -100,14 +100,14 @@ async function syncGoogleCalendar(){
     }
     googleDeleteQueue=remainingDeletes;saveGoogleDeleteQueue();
     for(const item of dated){
-      const targetCalendarId=item.googleCalendarId||selectedCalendarId||'primary';
+      let eventCalendarId=item.googleCalendarId||selectedCalendarId||'primary';
       const d=new Date(item.date+'T00:00:00');d.setDate(d.getDate()+1);
       const end=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
       const event={summary:item.title,description:(item.cat||'')+(item.notes?' - '+item.notes:''),start:item.time?{dateTime:new Date(item.date+'T'+item.time+':00').toISOString()}:{date:item.date},end:item.time?{dateTime:new Date(new Date(item.date+'T'+item.time+':00').getTime()+3600000).toISOString()}:{date:end},reminders:{useDefault:false,overrides:[{method:'popup',minutes:Math.min(40320,Math.max(0,Number(item.remind??30))*1440)}]}};
-      let url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(targetCalendarId)+'/events',method='POST';
+      let url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(eventCalendarId)+'/events',method='POST';
       if(item.googleEventId){url+='/'+encodeURIComponent(item.googleEventId);method='PATCH';}
       let response=await fetch(url,{method,headers,body:JSON.stringify(event)});
-      if(response.status===404&&item.googleEventId){delete item.googleEventId;delete item.googleCalendarId;const fallbackCalendarId=selectedCalendarId||'primary';url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(fallbackCalendarId)+'/events';method='POST';response=await fetch(url,{method,headers,body:JSON.stringify(event)});}
+      if(response.status===404&&item.googleEventId){delete item.googleEventId;delete item.googleCalendarId;eventCalendarId=selectedCalendarId||'primary';url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(eventCalendarId)+'/events';method='POST';response=await fetch(url,{method,headers,body:JSON.stringify(event)});}
       if(!response.ok){failed++;continue;}
       if(method==='POST'){const saved=await response.json();item.googleEventId=saved.id;item.googleCalendarId=method==='POST'?(url.match(/calendars\/([^/]+)\/events/)||[])[1]||selectedCalendarId:'primary';created++;}else updated++;
     }
