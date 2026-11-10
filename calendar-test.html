@@ -78,7 +78,7 @@ function connectGoogleCalendar(){
   googleTokenClient=google.accounts.oauth2.initTokenClient({client_id:GOOGLE_CLIENT_ID,scope:GOOGLE_SCOPE,callback:async(response)=>{
     if(response.error){googleStatus('Google-Zugriff nicht möglich: '+response.error);return;}
     googleAccessToken=response.access_token;googleTokenExpiresAt=Date.now()+Number(response.expires_in||3600)*1000;
-    try{await loadGoogleCalendars();await syncGoogleCalendar();}catch(error){googleStatus('Google-Kalender konnten nicht geladen werden: '+error.message);}
+    try{await loadGoogleCalendars();googleStatus('Kalender geladen. Bitte zuerst den Zielkalender auswählen und anschließend bewusst auf „Ausgewählte Einträge synchronisieren“ tippen.');}catch(error){googleStatus('Google-Kalender konnten nicht geladen werden: '+error.message);}
   }});
   googleTokenClient.requestAccessToken({prompt:'consent'});
 }
