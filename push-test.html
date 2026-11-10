@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="de" translate="no">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#007f86"><title>AllesImBlick – Push-Test</title>
+<style>
+:root{--g:#007f86;--g2:#00aeb5;--bg:#f2fbfb;--line:#d6eeee;--muted:#587477}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#172321;font:16px system-ui,sans-serif}
+main{max-width:620px;margin:0 auto;padding:22px 16px}header{background:var(--g);color:white;padding:24px 20px;border-radius:0 0 22px 22px}
+h1{margin:4px 0;font-size:26px}p{line-height:1.5}.card{background:white;border:1px solid var(--line);border-radius:15px;padding:16px;margin:14px 0}
+button{width:100%;border:0;border-radius:11px;padding:13px;background:var(--g2);color:white;font-weight:700;font-size:15px;margin-top:10px}
+button:disabled{opacity:.45}.muted{color:var(--muted);font-size:13px}.status{padding:10px;border-radius:10px;background:#e2f8f7;margin:8px 0;font-size:14px}
+</style></head>
+<body><header><small>ALLESIMBLICK · TECHNIKTEST</small><h1>Benachrichtigungen testen</h1><p>Wir prüfen, ob dein Gerät Benachrichtigungen für AllesImBlick zulässt.</p></header>
+<main>
+<div class="card"><b>1. Geräte- und Browserprüfung</b><div id="support" class="status">Prüfung läuft …</div><div id="permission" class="status">Berechtigung wird geprüft …</div></div>
+<div class="card"><b>2. Benachrichtigungen erlauben</b><p class="muted">Tippe auf die Schaltfläche und erlaube Benachrichtigungen, wenn dein Gerät danach fragt.</p><button id="allow">Benachrichtigungen erlauben</button></div>
+<div class="card"><b>3. Testmeldung anzeigen</b><p class="muted">Diese Testmeldung wird über den Service Worker ausgelöst. Sie prüft die Anzeige auf dem Gerät, ist aber noch keine zeitgesteuerte Push-Erinnerung aus dem Internet.</p><button id="test" disabled>Testmeldung senden</button></div>
+<div class="card"><b>Was noch fehlt</b><p class="muted">Damit Erinnerungen auch bei geschlossener App zum richtigen Zeitpunkt eintreffen, muss AllesImBlick zusätzlich mit einem Push-Server verbunden werden. Der Server und seine Schlüssel sind noch nicht eingerichtet. Diese Testseite verändert keine deiner gespeicherten Einträge.</p></div>
+<p class="muted"><a href="./">Zurück zu AllesImBlick</a></p>
+</main>
+<script>
+const support=document.getElementById("support"), permission=document.getElementById("permission"), allow=document.getElementById("allow"), test=document.getElementById("test");
+let registration=null;
+function showPermission(){const p=("Notification" in window)?Notification.permission:"nicht unterstützt";permission.textContent="Benachrichtigungsstatus: "+p;test.disabled=!(p==="granted"&&registration);}
+(async()=>{
+ const ok=("serviceWorker" in navigator)&&("Notification" in window);
+ support.textContent=ok?"Service Worker und Notification API werden unterstützt.":"Dieses Gerät oder dieser Browser unterstützt die benötigten Web-Funktionen nicht.";
+ if(ok&&window.isSecureContext){try{registration=await navigator.serviceWorker.register("./sw.js");await navigator.serviceWorker.ready;}catch(e){support.textContent="Service Worker konnte nicht gestartet werden: "+e.message;}}
+ else if(!window.isSecureContext){support.textContent="Bitte die App über HTTPS öffnen. Lokale Datei-Aufrufe funktionieren nicht.";}
+ showPermission();
+})();
+allow.addEventListener("click",async()=>{if(!("Notification" in window))return;try{await Notification.requestPermission();showPermission();}catch(e){permission.textContent="Freigabe nicht möglich: "+e.message;}});
+test.addEventListener("click",async()=>{if(!registration||Notification.permission!=="granted")return;try{await registration.showNotification("AllesImBlick – Testmeldung",{body:"Prima! Dein Gerät kann eine Benachrichtigung anzeigen.",icon:"./icon.svg",tag:"aib-local-test"});}catch(e){permission.textContent="Test fehlgeschlagen: "+e.message;}});
+</script></body></html>
