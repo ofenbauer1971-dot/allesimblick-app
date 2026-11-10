@@ -1,0 +1,17 @@
+{
+  "name": "allesimblick-reminder-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --config wrangler.jsonc",
+    "deploy": "wrangler deploy --config wrangler.jsonc",
+    "db:create": "wrangler d1 create allesimblick-reminders",
+    "db:migrate": "wrangler d1 execute allesimblick-reminders --remote --file=./schema.sql"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "wrangler": "^4.45.0"
+  }
+}
