@@ -1,4 +1,4 @@
-const CACHE_NAME = "allesimblick-v02-tuerkis";
+const CACHE_NAME = "allesimblick-v10-tuerkis";
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(FILES)));
